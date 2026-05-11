@@ -1,8 +1,11 @@
 package com.henheang.saaspractices.ntc.web;
 
+import com.henheang.saaspractices.cmm.PaginationVO;
 import com.henheang.saaspractices.ntc.service.NtcBoardInVO;
 import com.henheang.saaspractices.ntc.service.NtcBoardOutVO;
 import com.henheang.saaspractices.ntc.service.NtcBoardService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -24,6 +27,8 @@ import java.util.List;
 @Controller
 public class NtcBoardController {
 
+    private static final Logger log = LoggerFactory.getLogger(NtcBoardController.class);
+
     @Autowired
     private NtcBoardService ntcBoardService;
 
@@ -36,12 +41,20 @@ public class NtcBoardController {
             @ModelAttribute("searchVO") NtcBoardInVO inVO,
             ModelMap model) throws Exception {
 
+        log.debug("=== selectList called: page={}, condition={}, keyword={}",
+                inVO.getPageIndex(), inVO.getSearchCondition(), inVO.getSearchKeyword());
+
         List<NtcBoardOutVO> resultList = ntcBoardService.selectList(inVO);
         int totCnt = ntcBoardService.selectListTotCnt(inVO);
+
+        log.debug("=== selectList result: totCnt={}, returned={}", totCnt, resultList.size());
+
+        PaginationVO paging = new PaginationVO(totCnt, inVO.getPageIndex(), inVO.getRecordCountPerPage());
 
         model.addAttribute("resultList", resultList);
         model.addAttribute("totCnt", totCnt);
         model.addAttribute("searchVO", inVO);
+        model.addAttribute("paging", paging);
 
         return "ntc/NtcBoardList";
     }

@@ -16,6 +16,13 @@
     .page-header { margin-bottom: 20px; }
     .badge-use    { color: green; font-weight: bold; }
     .badge-nouse  { color: gray; }
+    .pagination   { margin-top: 16px; text-align: center; }
+    .pagination a, .pagination span {
+      display: inline-block; padding: 5px 10px; margin: 0 2px;
+      border: 1px solid #ccc; border-radius: 3px; text-decoration: none; color: #333;
+    }
+    .pagination .current { background: #333; color: #fff; border-color: #333; font-weight: bold; }
+    .pagination a:hover  { background: #f0f0f0; }
   </style>
 </head>
 <body>
@@ -75,6 +82,37 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Pagination bar 페이지 네비게이션 -->
+  <div class="pagination">
+    <!-- First / Prev block -->
+    <a th:if="${paging.hasPrev}"
+       th:href="@{/ntcBoard/list.do(pageIndex=1,searchCondition=${searchVO.searchCondition},searchKeyword=${searchVO.searchKeyword})}">
+      처음 / First
+    </a>
+    <a th:if="${paging.hasPrev}"
+       th:href="@{/ntcBoard/list.do(pageIndex=${paging.prevPage},searchCondition=${searchVO.searchCondition},searchKeyword=${searchVO.searchKeyword})}">
+      &lt; 이전 / Prev
+    </a>
+
+    <!-- Page numbers -->
+    <th:block th:each="page : ${#numbers.sequence(paging.firstPage, paging.lastPage)}">
+      <span th:if="${page == paging.currentPage}" class="current" th:text="${page}">1</span>
+      <a th:unless="${page == paging.currentPage}"
+         th:href="@{/ntcBoard/list.do(pageIndex=${page},searchCondition=${searchVO.searchCondition},searchKeyword=${searchVO.searchKeyword})}"
+         th:text="${page}">1</a>
+    </th:block>
+
+    <!-- Next block / Last -->
+    <a th:if="${paging.hasNext}"
+       th:href="@{/ntcBoard/list.do(pageIndex=${paging.nextPage},searchCondition=${searchVO.searchCondition},searchKeyword=${searchVO.searchKeyword})}">
+      다음 / Next &gt;
+    </a>
+    <a th:if="${paging.hasNext}"
+       th:href="@{/ntcBoard/list.do(pageIndex=${paging.totalPageCount},searchCondition=${searchVO.searchCondition},searchKeyword=${searchVO.searchKeyword})}">
+      끝 / Last
+    </a>
+  </div>
 
   <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
     <a th:href="@{/ntcBoard/deletedList.do}" class="btn"
