@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>공지사항 수정 / Notice Update</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h2 { margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    label.field-label { display: block; font-weight: bold; margin-bottom: 4px; color: #333; }
+    input[type=text], textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    textarea { height: 150px; }
+    .readonly { color: #666; padding: 8px 0; display: block; }
+    .btn { padding: 6px 14px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; }
+    .btn-primary { background: #333; color: #fff; border-color: #333; }
+    .btn-danger  { background: #c00; color: #fff; border-color: #c00; }
+    .footer { margin-top: 24px; display: flex; gap: 8px; }
+    .required { color: red; }
+  </style>
+</head>
+<body>
+
+  <h2>공지사항 상세/수정 / Notice Detail / Update</h2>
+
+  <form th:action="@{/ntcBoard/update.do}" method="post" th:object="${ntcBoardVO}">
+
+    <!-- ★ PK hidden — 수정/삭제 대상 식별 / identifies which row to update/delete -->
+    <input type="hidden" th:field="*{noticeSn}"/>
+
+    <div class="form-group">
+      <label class="field-label">번호 / No</label>
+      <span class="readonly" th:text="*{noticeSn}">1</span>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">
+        제목 / Title <span class="required">*</span>
+      </label>
+      <label>
+        <input type="text" th:field="*{noticeTitle}" required/>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">내용 / Content</label>
+      <label>
+        <textarea th:field="*{noticeCn}"></textarea>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">사용여부 / Status</label>
+      <label><input type="radio" th:field="*{useYn}" value="Y"/> 사용 / Active</label>
+      &nbsp;
+      <label><input type="radio" th:field="*{useYn}" value="N"/> 미사용 / Inactive</label>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">등록자 / Registered By</label>
+      <span class="readonly" th:text="*{dataRegId}">admin</span>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">등록일 / Registered Date</label>
+      <span class="readonly" th:text="*{dataRegDt}">2026-01-01</span>
+    </div>
+
+    <div class="footer">
+      <a th:href="@{/ntcBoard/list.do}" class="btn">목록 / List</a>
+      <button type="button" class="btn btn-danger"
+        onclick="if(confirm('삭제하시겠습니까? / Are you sure to delete?'))
+                 document.getElementById('deleteForm').submit();">
+        삭제 / Delete
+      </button>
+      <button type="submit" class="btn btn-primary">수정 / Update</button>
+    </div>
+
+  </form>
+
+  <!-- ★ 삭제 전용 폼 / Delete-only form — PK만 전송 / sends only PK -->
+  <form id="deleteForm" th:action="@{/ntcBoard/delete.do}" method="post" hidden>
+    <input type="hidden" name="noticeSn" th:value="${ntcBoardVO?.noticeSn}"/>
+  </form>
+
+</body>
+</html>

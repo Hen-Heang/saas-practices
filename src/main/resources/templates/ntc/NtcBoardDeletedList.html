@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>삭제된 공지사항 / Deleted Notices</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    th { background: #f5c6c6; }
+    td.text-left { text-align: left; }
+    .btn { padding: 6px 14px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; }
+    .btn-restore { background: #2a7; color: #fff; border-color: #2a7; }
+    .btn-back    { background: #555; color: #fff; border-color: #555; }
+    .page-header { margin-bottom: 20px; }
+    .empty-msg { color: #999; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h2>🗑 삭제된 공지사항 / Deleted Notices
+      <small style="font-size:14px; color:#c00;">
+        — 복원하면 목록에 다시 표시됩니다 / Restore to make visible again
+      </small>
+    </h2>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">번호 / No</th>
+        <th>제목 / Title</th>
+        <th style="width:120px">삭제자 / Deleted By</th>
+        <th style="width:160px">삭제일시 / Deleted At</th>
+        <th style="width:100px">복원 / Restore</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${deletedList == null or #lists.isEmpty(deletedList)}">
+        <td colspan="5" class="empty-msg">
+          삭제된 데이터가 없습니다. / No deleted records found.
+        </td>
+      </tr>
+      <tr th:each="item : ${deletedList}">
+        <td th:text="${item.noticeSn}">1</td>
+        <td class="text-left" th:text="${item.noticeTitle}">제목</td>
+        <td th:text="${item.dataChgId}">admin</td>
+        <td th:text="${item.dataChgDt}">2026-01-01</td>
+        <td>
+          <!-- Restore form — sends only PK -->
+          <form th:action="@{/ntcBoard/restore.do}" method="post" style="display:inline">
+            <input type="hidden" name="noticeSn" th:value="${item.noticeSn}"/>
+            <button type="button" class="btn btn-restore"
+              onclick="if(confirm('복원하시겠습니까? / Restore this record?'))
+                       this.closest('form').submit();">
+              복원 / Restore
+            </button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 16px;">
+    <a th:href="@{/ntcBoard/list.do}" class="btn btn-back">
+      ← 목록으로 / Back to List
+    </a>
+  </div>
+
+</body>
+</html>

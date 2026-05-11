@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.henheang.saaspractices.ntc.mapper.NtcBoardMapper">
+
+    <!-- resultMap: real DB columns of co_notice_m → OutVO fields -->
+    <resultMap id="ntcBoard" type="com.henheang.saaspractices.ntc.service.NtcBoardOutVO">
+        <result property="noticeSn"    column="notice_sn"/>
+        <result property="noticeTitle" column="notice_title"/>
+        <result property="noticeCn"    column="notice_cn"/>
+        <result property="useYn"       column="use_yn"/>
+        <result property="dataRegId"   column="data_reg_id"/>
+        <result property="dataRegDt"   column="data_reg_dt"/>
+        <result property="dataChgId"   column="data_chg_id"/>
+        <result property="dataChgDt"   column="data_chg_dt"/>
+    </resultMap>
+
+    <!-- LIST -->
+    <select id="selectList"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO"
+            resultMap="ntcBoard">
+        SELECT notice_sn,
+               notice_title,
+               use_yn,
+               data_reg_id,
+               TO_CHAR(data_reg_dt, 'YYYY-MM-DD') AS data_reg_dt
+          FROM co_notice_m
+         WHERE use_yn = 'Y'
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <if test='searchCondition == "1"'>
+               AND notice_title ILIKE '%' || #{searchKeyword} || '%'
+            </if>
+            <if test='searchCondition == "2"'>
+               AND notice_cn ILIKE '%' || #{searchKeyword} || '%'
+            </if>
+        </if>
+         ORDER BY notice_sn DESC
+         LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+    </select>
+
+    <!-- COUNT -->
+    <select id="selectListTotCnt"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO"
+            resultType="int">
+        SELECT COUNT(*)
+          FROM co_notice_m
+         WHERE use_yn = 'Y'
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <if test='searchCondition == "1"'>
+               AND notice_title ILIKE '%' || #{searchKeyword} || '%'
+            </if>
+            <if test='searchCondition == "2"'>
+               AND notice_cn ILIKE '%' || #{searchKeyword} || '%'
+            </if>
+        </if>
+    </select>
+
+    <!-- DETAIL -->
+    <select id="selectDetail" resultMap="ntcBoard">
+        SELECT notice_sn,
+               notice_title,
+               notice_cn,
+               use_yn,
+               data_reg_id,
+               TO_CHAR(data_reg_dt, 'YYYY-MM-DD HH24:MI:SS') AS data_reg_dt,
+               data_chg_id,
+               TO_CHAR(data_chg_dt, 'YYYY-MM-DD HH24:MI:SS') AS data_chg_dt
+          FROM co_notice_m
+         WHERE notice_sn = #{noticeSn}
+    </select>
+
+    <!-- INSERT -->
+    <insert id="insert"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO">
+        INSERT INTO co_notice_m (
+            notice_sn,
+            notice_title,
+            notice_cn,
+            use_yn,
+            data_reg_id,
+            data_reg_dt
+        ) VALUES (
+            nextval('seq_co_notice_m'),
+            #{noticeTitle},
+            #{noticeCn},
+            #{useYn},
+            #{dataRegId},
+            NOW()
+        )
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO">
+        UPDATE co_notice_m
+           SET notice_title = #{noticeTitle},
+               notice_cn    = #{noticeCn},
+               use_yn       = #{useYn},
+               data_chg_id  = #{dataChgId},
+               data_chg_dt  = NOW()
+         WHERE notice_sn = #{noticeSn}
+    </update>
+
+    <!-- DELETED LIST — shows only use_yn = 'N' records -->
+    <select id="selectDeletedList"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO"
+            resultMap="ntcBoard">
+        SELECT notice_sn,
+               notice_title,
+               use_yn,
+               data_chg_id,
+               TO_CHAR(data_chg_dt, 'YYYY-MM-DD HH24:MI:SS') AS data_chg_dt
+          FROM co_notice_m
+         WHERE use_yn = 'N'
+         ORDER BY data_chg_dt DESC
+    </select>
+
+    <!-- RESTORE — set use_yn back to 'Y' -->
+    <update id="restore"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO">
+        UPDATE co_notice_m
+           SET use_yn      = 'Y',
+               data_chg_id = #{dataChgId},
+               data_chg_dt = NOW()
+         WHERE notice_sn = #{noticeSn}
+    </update>
+
+    <!-- SOFT DELETE — update use_yn = 'N' instead of physical delete -->
+    <update id="delete"
+            parameterType="com.henheang.saaspractices.ntc.service.NtcBoardInVO">
+        UPDATE co_notice_m
+           SET use_yn      = 'N',
+               data_chg_id = #{dataChgId},
+               data_chg_dt = NOW()
+         WHERE notice_sn = #{noticeSn}
+    </update>
+
+</mapper>

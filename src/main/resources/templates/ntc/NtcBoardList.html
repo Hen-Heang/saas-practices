@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>공지사항 목록 / Notice Board List</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+    th { background: #f0f0f0; }
+    td.text-left { text-align: left; }
+    a { color: #333; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .btn { padding: 6px 14px; cursor: pointer; }
+    .search-bar { margin-bottom: 16px; }
+    .page-header { margin-bottom: 20px; }
+    .badge-use    { color: green; font-weight: bold; }
+    .badge-nouse  { color: gray; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h2>공지사항 목록 / Notice Board List
+      &nbsp;<small style="font-size:14px; color:#666;">
+        총 / Total: <span th:text="${totCnt}">0</span>건 / items
+      </small>
+    </h2>
+  </div>
+
+  <!-- Search form 검색 폼 -->
+  <form class="search-bar" th:action="@{/ntcBoard/list.do}" method="get">
+    <label>검색조건 / Search By:</label>
+    <label>
+      <select name="searchCondition">
+        <option value="1" th:selected="${searchVO.searchCondition == '1'}">제목 / Title</option>
+        <option value="2" th:selected="${searchVO.searchCondition == '2'}">내용 / Content</option>
+      </select>
+    </label>
+    <label>
+      <input type="text" name="searchKeyword"
+             th:value="${searchVO.searchKeyword}"
+             placeholder="검색어 입력 / Enter keyword"/>
+    </label>
+    <button type="submit" class="btn">검색 / Search</button>
+  </form>
+
+  <!-- List table 목록 테이블 -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">번호 / No</th>
+        <th>제목 / Title</th>
+        <th style="width:90px">사용여부 / Use</th>
+        <th style="width:110px">등록자 / Reg. By</th>
+        <th style="width:120px">등록일 / Reg. Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${resultList == null or #lists.isEmpty(resultList)}">
+        <td colspan="5">조회된 데이터가 없습니다. / No data found.</td>
+      </tr>
+      <tr th:each="item, stat : ${resultList}">
+        <td th:text="${totCnt - stat.index}">1</td>
+        <td class="text-left">
+          <a th:href="@{/ntcBoard/detail.do(noticeSn=${item.noticeSn})}"
+             th:text="${item.noticeTitle}">제목 / Title</a>
+        </td>
+        <td>
+          <span th:if="${item.useYn == 'Y'}" class="badge-use">사용 / Active</span>
+          <span th:unless="${item.useYn == 'Y'}" class="badge-nouse">미사용 / Inactive</span>
+        </td>
+        <td th:text="${item.dataRegId}">admin</td>
+        <td th:text="${item.dataRegDt}">2026-01-01</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
+    <a th:href="@{/ntcBoard/deletedList.do}" class="btn"
+       style="background:#c00;color:#fff;">🗑 삭제목록 / Deleted List</a>
+    <a th:href="@{/ntcBoard/insertView.do}" class="btn"
+       style="background:#333;color:#fff;">등록 / Register</a>
+  </div>
+
+</body>
+</html>
