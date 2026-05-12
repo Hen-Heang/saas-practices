@@ -14,7 +14,6 @@ public class PaginationVO {
     private final int currentPage;
     private final int totalCount;
     private final int recordCountPerPage;
-    private final int pageSize = 10;       // number of page links shown per block
 
     private final int totalPageCount;
     private final int firstPage;           // first page number in current block
@@ -31,6 +30,8 @@ public class PaginationVO {
         this.totalPageCount = Math.max(1, (int) Math.ceil((double) totalCount / recordCountPerPage));
 
         // which block of 10 pages are we in?
+        // number of page links shown per block
+        int pageSize = 10;
         int currentBlock = (int) Math.ceil((double) currentPage / pageSize);
         this.firstPage = (currentBlock - 1) * pageSize + 1;
         this.lastPage  = Math.min(firstPage + pageSize - 1, totalPageCount);

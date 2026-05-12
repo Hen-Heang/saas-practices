@@ -10,6 +10,11 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     cache: false
+  # Run schema.sql + data.sql on every startup (idempotent — uses IF NOT EXISTS).
+  # The default for non-embedded DBs is 'embedded' (= never), so we must set this to 'always'.
+  sql:
+    init:
+      mode: always
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
